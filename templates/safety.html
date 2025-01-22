@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Safety Check</title>
+    <style>
+        button {
+            margin: 5px;
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+        .alert {
+            color: red;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    </style>
+    <script>
+        function validateSafetyForm() {
+            const subtotal = parseFloat(document.querySelector('input[name="subtotal"]').value) || 0;
+            const tax = parseFloat(document.querySelector('input[name="tax"]').value) || 0;
+            const tip = parseFloat(document.querySelector('input[name="tip"]').value) || 0;
+            const total = parseFloat(document.querySelector('input[name="total"]').value) || 0;
+
+            let calculatedTotal = (subtotal + tax + tip).toFixed(2);
+            if (parseFloat(calculatedTotal) !== total) {
+                alert(`Total does not match: Expected $${calculatedTotal}, but got $${total}. Please fix the values.`);
+                return false;
+            }
+
+            let itemTotal = 0;
+            document.querySelectorAll('input[name^="item_price_"]').forEach(input => {
+                itemTotal += parseFloat(input.value) || 0;
+            });
+
+            if (itemTotal.toFixed(2) !== subtotal.toFixed(2)) {
+                alert(`Subtotal does not match item prices: Expected $${itemTotal.toFixed(2)}, but got $${subtotal.toFixed(2)}. Please fix the values.`);
+                return false;
+            }
+
+            const numPeople = document.querySelector('input[name="num_people"]').value;
+            if (numPeople < 1 || isNaN(numPeople)) {
+                alert("Please enter a valid number of people.");
+                return false;
+            }
+
+            return true;
+        }
+
+        function addItem() {
+            const table = document.querySelector("table tbody");
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td><input type="text" name="item_name_" required></td>
+                <td><input type="number" name="item_quantity_" required></td>
+                <td><input type="number" step="0.01" name="item_price_" required></td>
+                <td><button type="button" onclick="deleteRow(this)">Delete</button></td>
+            `;
+            table.appendChild(row);
+        }
+
+        function deleteRow(button) {
+            button.closest('tr').remove();
+        }
+    </script>
+</head>
+<body>
+    <h1>Safety Check</h1>
+    {% if not parsed_data['items'] %}
+        <p class="alert">"{{ parsed_data }}" is all we got from the photo. Please input the rest of your items individualy.</p>
+    {% endif %}
+    <form action="/safety" method="post" onsubmit="return validateSafetyForm()">
+        <h2>Items</h2>
+        <table border="1">
+            <tr>
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Action</th>
+            </tr>
+            <tbody>
+                {% for item in parsed_data['items'] %}
+                <tr>
+                    <td><input type="text" name="item_name_{{ loop.index0 }}" value="{{ item.name }}" required></td>
+                    <td><input type="number" name="item_quantity_{{ loop.index0 }}" value="{{ item.quantity }}" required></td>
+                    <td><input type="number" step="0.01" name="item_price_{{ loop.index0 }}" value="{{ item.price }}" required></td>
+                    <td><button type="button" onclick="deleteRow(this)">Delete</button></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <button type="button" onclick="addItem()">Add Item</button>
+
+        <h2>Summary</h2>
+        <p>Subtotal: <input type="number" step="0.01" name="subtotal" value="{{ parsed_data['subtotal'] }}" required></p>
+        <p>Tax: <input type="number" step="0.01" name="tax" value="{{ parsed_data['tax'] }}" required></p>
+        <p>Tip: <input type="number" step="0.01" name="tip" value="{{ parsed_data['tip'] }}" required></p>
+        <p>Total: <input type="number" step="0.01" name="total" value="{{ parsed_data['total'] }}" required></p>
+
+        <h2>How many people are splitting the check?</h2>
+        <p>Number of People: <input type="number" id="num_people" name="num_people" min="1" required onchange="generateNameInputs()"></p>
+
+        <div id="people_names">
+            <!-- Names will be added dynamically here -->
+        </div>
+
+        <script>
+            function generateNameInputs() {
+                let numPeople = document.getElementById('num_people').value;
+                let container = document.getElementById('people_names');
+                container.innerHTML = '';  // Clear previous entries
+
+                for (let i = 0; i < numPeople; i++) {
+                    container.innerHTML += `<p>Person ${i + 1}: <input type="text" name="person_name_${i}" required></p>`;
+                }
+            }
+        </script>
+
+        <button type="submit">Proceed</button>
+    </form>
+</body>
+</html>

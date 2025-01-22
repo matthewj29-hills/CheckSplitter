@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Receipt</title>
+    <style>
+        #loading {
+            display: none;
+            color: green;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+    </style>
+    <script>
+        function validateFile() {
+            const fileInput = document.getElementById('receipt');
+            const file = fileInput.files[0];
+            const maxSize = 5 * 1024 * 1024;  // 5MB limit
+            const allowedExtensions = ['png', 'jpg', 'jpeg', 'heic'];
+
+            if (!file) {
+                alert('Please select a file to upload.');
+                return false;
+            }
+
+            const fileExtension = file.name.split('.').pop().toLowerCase();
+            if (!allowedExtensions.includes(fileExtension)) {
+                alert('Invalid file type. Please upload a PNG, JPG, JPEG, or HEIC file.');
+                return false;
+            }
+
+            if (file.size > maxSize) {
+                alert('File size exceeds 5MB. Please choose a smaller file.');
+                return false;
+            }
+
+            document.getElementById('loading').style.display = 'block';
+            return true;
+        }
+    </script>
+</head>
+<body>
+    <h1>Upload a Receipt</h1>
+    <form action="/" method="post" enctype="multipart/form-data" onsubmit="return validateFile()">
+        <label for="receipt">Choose a receipt image:</label>
+        <input type="file" id="receipt" name="receipt" accept=".png,.jpg,.jpeg,.heic" required>
+        <button type="submit">Upload</button>
+    </form>
+    <p id="loading">Uploading... Please wait.</p>
+</body>
+</html>
