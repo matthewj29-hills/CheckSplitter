@@ -31,6 +31,10 @@ def index():
             extracted_text = extract_text_from_image(file_path)
             session["parsed_data"] = parse_receipt(extracted_text)
             session["assignments"] = {}
+
+            # Debugging: Print the parsed data to check if it's correctly stored in session
+            print("Parsed Data in Session (Index):", session.get("parsed_data"))
+
         except UnidentifiedImageError:
             flash("Unsupported image format. Please upload a valid receipt image.")
             return redirect(url_for('index'))
@@ -45,6 +49,9 @@ def index():
 @app.route("/safety", methods=["GET", "POST"])
 def safety():
     parsed_data, _ = get_session_data()
+
+    # Debugging: Print the parsed data when reaching the safety page
+    print("Parsed Data in Safety Screen:", parsed_data)
 
     if request.method == "POST":
         num_people = int(request.form.get("num_people"))
