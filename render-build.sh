@@ -1,5 +1,2 @@
 #!/bin/bash
-# Update package lists
-apt-get update 
-# Install Tesseract OCR
-apt-get install -y tesseract-ocr 
+apt-get update && apt-get install -y tesseract-ocr
