@@ -26,13 +26,17 @@ def index():
         file_path = os.path.join(app.config["UPLOAD_FOLDER"], receipt.filename)
         receipt.save(file_path)
 
+        print(f"Uploaded file saved to: {file_path}")  # Debugging log
+
         try:
             image = Image.open(file_path)
             extracted_text = extract_text_from_image(file_path)
+
+            print(f"Extracted Text: {extracted_text}")  # Debugging log
+
             session["parsed_data"] = parse_receipt(extracted_text)
             session["assignments"] = {}
 
-            # Debugging: Print the parsed data to check if it's correctly stored in session
             print("Parsed Data in Session (Index):", session.get("parsed_data"))
 
         except UnidentifiedImageError:
@@ -45,6 +49,7 @@ def index():
         return redirect(url_for('safety'))
 
     return render_template("index.html")
+
 
 @app.route("/safety", methods=["GET", "POST"])
 def safety():
