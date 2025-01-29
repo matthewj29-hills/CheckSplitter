@@ -60,22 +60,33 @@ def safety():
         people_names = [request.form.get(f"person_name_{i}") for i in range(num_people)]
         session["people_names"] = people_names
 
-        edited_items = []
+        edited_items = session.get("parsed_data", {}).get("items", [])  # Ensure existing items are carried forward
         item_names = request.form.getlist("item_name_")
         item_quantities = request.form.getlist("item_quantity_")
         item_prices = request.form.getlist("item_price_")
 
+        new_items = []  # Store newly entered items
         for i in range(len(item_names)):
             try:
-                item_name = item_names[i]
+                item_name = item_names[i].strip()
                 item_quantity = int(item_quantities[i])
-                item_price = float(item_prices[i])
-                edited_items.append({"name": item_name, "quantity": item_quantity, "price": item_price})
+                item_price = float(item_prices[i]) / item_quantity  # Split price evenly per unit
+                
+                # Instead of storing one entry with quantity > 1, store multiple entries
+                for _ in range(item_quantity):
+                    new_items.append({"name": item_name, "price": item_price})  # Quantity is implied
+                
             except ValueError:
                 flash("Invalid input. Please enter valid numbers for quantity and price.")
                 return render_template("safety.html", parsed_data=parsed_data)
 
-        parsed_data["items"] = edited_items
+        # Append new items instead of overwriting
+        parsed_data["items"] = edited_items + new_items  
+  
+
+        session["parsed_data"] = parsed_data  # Explicitly update session
+        session.modified = True
+
         parsed_data["subtotal"] = float(request.form.get("subtotal"))
         parsed_data["tax"] = float(request.form.get("tax"))
         parsed_data["tip"] = float(request.form.get("tip"))
@@ -92,6 +103,10 @@ def assign_items():
     parsed_data, assignments = get_session_data()
     num_people = session.get("num_people", 1)
     people_names = session.get("people_names", [])
+
+    # Debugging: Print session data to check its state
+    print("Parsed Data in Session (Assign Items):", parsed_data)
+    print("People Names in Session (Assign Items):", people_names)
 
     if request.method == "POST":
         assignments = {name: {"items": [], "shared": []} for name in people_names}
@@ -113,6 +128,7 @@ def assign_items():
         return redirect(url_for('results'))
 
     return render_template("assign_items.html", parsed_data=parsed_data, assignments=assignments, num_people=num_people)
+
 
 @app.route("/results", methods=["GET", "POST"])
 def results():

@@ -30,7 +30,7 @@
             </tr>
             {% for item in parsed_data['items'] %}
             <tr>
-                <td>{{ item.name }}</td>
+                <td>{{ item["name"] }}</td>
                 <td>
                     <select name="item_{{ loop.index0 }}" multiple required> size="3">
                         {% for person in session['people_names'] %}
