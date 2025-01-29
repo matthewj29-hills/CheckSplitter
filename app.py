@@ -2,6 +2,11 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 import os
 from algorithm import extract_text_from_image, parse_receipt
 from PIL import Image, UnidentifiedImageError
+import pytesseract
+
+# Manually set Tesseract path on Render
+pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
+
 
 app = Flask(__name__)
 app.secret_key = "your_secret_key"
