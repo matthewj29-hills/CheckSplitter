@@ -1,12 +1,14 @@
 #!/bin/bash
+set -e  # Stop script on first error
+
 # Update package lists
 apt-get update 
 
-# Install Tesseract OCR and English language pack
-apt-get install -y tesseract-ocr tesseract-ocr-eng 
+# Install Tesseract OCR and necessary language data
+apt-get install -y tesseract-ocr tesseract-ocr-eng
 
-# Print Tesseract version to confirm installation
-tesseract --version
-
-# Show where Tesseract is installed
+# Show installation path of Tesseract
 which tesseract
+
+# Show Tesseract version to confirm installation
+tesseract --version
