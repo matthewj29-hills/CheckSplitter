@@ -61,7 +61,7 @@
                 <td>
                     {% if 'items' in totals and totals['items'] %}
                         {% for item in totals['items'] %}
-                            {{ item }}<br>
+                            {{ item["name"] }} - ${{ "%.2f"|format(item["price"]) }}<br>
                         {% endfor %}
                     {% else %}
                         <em>No items assigned</em>
@@ -71,12 +71,13 @@
                 <td>
                     {% if 'shared' in totals and totals['shared'] %}
                         {% for item in totals['shared'] %}
-                            {{ item }}<br>
+                            {{ item["name"] }} - ${{ "%.2f"|format(item["price"]) }} (Shared)<br>
                         {% endfor %}
                     {% else %}
                         <em>No shared items</em>
                     {% endif %}
                 </td>
+                
                 <td>${{ "%.2f"|format(totals.tax_share) }}</td>
                 <td>${{ "%.2f"|format(totals.tip_share) }}</td>
                 <td>${{ "%.2f"|format(totals.total) }}</td>

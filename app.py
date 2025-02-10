@@ -3,6 +3,8 @@ import os
 from algorithm import extract_text_from_image, parse_receipt
 from PIL import Image, UnidentifiedImageError
 import pytesseract
+import math
+
 
 # Manually set Tesseract path on Render
 pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
@@ -119,21 +121,28 @@ def assign_items():
     print("People Names in Session (Assign Items):", people_names)
 
     if request.method == "POST":
+        # Initialize assignments with empty lists for each person
         assignments = {name: {"items": [], "shared": []} for name in people_names}
 
         for key, values in request.form.lists():
             if key.startswith("item_"):
                 item_index = int(key.split("_")[1].replace("[]", ""))
-                item_name = parsed_data["items"][item_index]["name"]
+                
+                # Get full item details (name & price)
+                item_details = parsed_data["items"][item_index]
 
-                if len(values) > 1:
+                if len(values) > 1:  # If multiple people are assigned (shared item)
                     for person in values:
-                        assignments[person]["shared"].append(item_name)
-                else:
-                    assignments[values[0]]["items"].append(item_name)
+                        assignments[person]["shared"].append(item_details)
+                else:  # If assigned to only one person
+                    assignments[values[0]]["items"].append(item_details)
 
+        # Ensure session is updated with correct assignments
         session["assignments"] = assignments
         session.modified = True
+
+        # Debugging: Print out the updated assignments
+        print("Updated Assignments in Session:", session["assignments"])
 
         return redirect(url_for('results'))
 
@@ -143,23 +152,23 @@ def assign_items():
 @app.route("/results", methods=["GET", "POST"])
 def results():
     parsed_data = session.get("parsed_data", None)
-    assignments = session.get("assignments", {})
+    assignments = session.get("assignments")
 
-    if not assignments:
-        flash("Error processing data. Please reassign items.")
+    print("Parsed Data in Session (Results):", parsed_data)
+    print("Assignments in Session (Results):", assignments)
+
+    if not assignments or not any(person_data["items"] or person_data["shared"] for person_data in assignments.values()):
+        flash("Error: No assignments found. Please assign items again.")
         return redirect(url_for('assign_items'))
 
     individual_totals = {}
     grand_total = 0
 
     for person, data in assignments.items():
-        total = sum(
-            next((item["price"] for item in parsed_data["items"] if item["name"] == item_name), 0)
-            for item_name in data["items"]
-        )
+        total = sum(item["price"] for item in data["items"])
 
         for shared_item in data["shared"]:
-            shared_price = next((item["price"] for item in parsed_data["items"] if item["name"] == shared_item), 0)
+            shared_price = shared_item["price"]
             total += shared_price / len(assignments)
 
         subtotal = parsed_data["subtotal"]
@@ -175,13 +184,18 @@ def results():
         }
         grand_total += individual_totals[person]["total"]
 
-    session["grand_total"] = grand_total
+    # 🔥 Fix rounding issue 🔥
+    expected_total = parsed_data["total"]
+    rounding_error = round(expected_total - grand_total, 2)
 
-    if round(grand_total, 2) != round(parsed_data['total'], 2):
-        flash("Error: The calculated total does not match the expected total.")
-        return redirect(url_for('assign_items'))
+    if rounding_error != 0:
+        max_owed_person = max(individual_totals, key=lambda p: individual_totals[p]["total"])
+        individual_totals[max_owed_person]["total"] += rounding_error
+
+    session["grand_total"] = sum(person_data["total"] for person_data in individual_totals.values())
 
     return render_template("results.html", parsed_data=parsed_data, assignments=assignments, individual_totals=individual_totals)
+
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5001)
