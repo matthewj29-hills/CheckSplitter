@@ -4,10 +4,25 @@ from algorithm import extract_text_from_image, parse_receipt
 from PIL import Image, UnidentifiedImageError
 import pytesseract
 import math
+import os
+import urllib.request
+import subprocess
 
 
-# Manually set Tesseract path on Render
-pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
+# Define the URL of a prebuilt Tesseract binary (update if necessary)
+TESSERACT_URL = "https://github.com/tesseract-ocr/tessdata_best/releases/latest/download/tesseract"
+
+# Define the local path where Tesseract will be stored
+TESSERACT_PATH = "/tmp/tesseract"
+
+# Download Tesseract if it's not already installed
+if not os.path.exists(TESSERACT_PATH):
+    print("Downloading Tesseract binary...")
+    urllib.request.urlretrieve(TESSERACT_URL, TESSERACT_PATH)
+    os.chmod(TESSERACT_PATH, 0o755)  # Make it executable
+
+# Set Tesseract command path for pytesseract
+pytesseract.pytesseract.tesseract_cmd = TESSERACT_PATH
 
 
 app = Flask(__name__)
