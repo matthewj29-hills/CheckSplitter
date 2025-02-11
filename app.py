@@ -10,7 +10,8 @@ import subprocess
 
 
 # Define the URL of a prebuilt Tesseract binary (update if necessary)
-TESSERACT_URL = "https://github.com/tesseract-ocr/tessdata_best/releases/latest/download/tesseract"
+TESSERACT_URL = "https://github.com/tesseract-ocr/tesseract/releases/download/5.3.3/tesseract-5.3.3-linux-x86_64"
+
 
 # Define the local path where Tesseract will be stored
 TESSERACT_PATH = "/tmp/tesseract"
