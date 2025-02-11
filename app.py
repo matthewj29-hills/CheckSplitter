@@ -13,20 +13,12 @@ import os
 import urllib.request
 import pytesseract
 
-# ✅ Use a working prebuilt Tesseract binary
-TESSERACT_URL = "https://github.com/tesseract-ocr/tessdata_best/raw/main/tessdata_fast/eng.traineddata"
+# Set the path for Tesseract OCR (no need to download)
+TESSERACT_PATH = "/app/.apt/usr/share/tesseract-ocr/5/tesseract"
 
-# ✅ Store Tesseract in a temporary directory
-TESSERACT_PATH = "/usr/bin/tesseract"
-
-# ✅ If Tesseract is missing, download the correct binary
-if not os.path.exists(TESSERACT_PATH):
-    print("Downloading Tesseract binary...")
-    urllib.request.urlretrieve(TESSERACT_URL, TESSERACT_PATH)
-    os.chmod(TESSERACT_PATH, 0o755)  # Make it executable
-
-# ✅ Set Tesseract OCR path for pytesseract
+# Set Tesseract OCR path for pytesseract
 pytesseract.pytesseract.tesseract_cmd = TESSERACT_PATH
+
 
 
 
