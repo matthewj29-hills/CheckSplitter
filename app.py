@@ -14,10 +14,13 @@ import urllib.request
 import pytesseract
 
 # Set the path for Tesseract OCR (no need to download)
-TESSERACT_PATH = "/app/.apt/usr/share/tesseract-ocr/5/tesseract"
+TESSERACT_PATH = "/app/.apt/usr/bin/tesseract"
 
 # Set Tesseract OCR path for pytesseract
 pytesseract.pytesseract.tesseract_cmd = TESSERACT_PATH
+
+
+# Set Tesseract OCR path for pytesseract
 
 
 
