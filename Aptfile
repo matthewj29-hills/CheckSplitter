@@ -1,11 +1,8 @@
-# Fix for missing libarchive13 dependency
 libarchive13
-
-# Tesseract OCR dependencies
 tesseract-ocr
-tesseract-ocr-eng  # English language support
-tesseract-ocr-deu  # German language support
-tesseract-ocr-fra  # French language support
-tesseract-ocr-kat  # Georgian language support
-tesseract-ocr-pol  # Polish language support
-tesseract-ocr-rus  # Russian language support
+tesseract-ocr-eng
+tesseract-ocr-deu
+tesseract-ocr-fra
+tesseract-ocr-kat
+tesseract-ocr-pol
+tesseract-ocr-rus
