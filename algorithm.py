@@ -1,6 +1,15 @@
 import pytesseract
 from PIL import Image, UnidentifiedImageError, ImageOps
 import re
+import os
+
+# ✅ Ensure Tesseract uses the correct path from the buildpack
+TESSERACT_PATH = "/app/vendor/tesseract-ocr/bin/tesseract"
+pytesseract.pytesseract.tesseract_cmd = TESSERACT_PATH
+
+# ✅ Set the tessdata directory correctly
+os.environ["TESSDATA_PREFIX"] = "/app/vendor/tesseract-ocr/share/tessdata"
+
 
 def preprocess_image(image_path):
     """
