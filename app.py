@@ -13,20 +13,20 @@ import os
 import urllib.request
 import pytesseract
 
-# Detect Tesseract binary path dynamically
-TESSERACT_PATHS = [
-    "/app/.apt/usr/bin/tesseract",  # Heroku Tesseract buildpack
-    "/usr/bin/tesseract",  # Default system install (e.g., local or different environments)
-]
+import os
+import pytesseract
 
-for path in TESSERACT_PATHS:
-    if os.path.exists(path):
-        pytesseract.pytesseract.tesseract_cmd = path
-        break
+# Set correct Tesseract path for Heroku
+TESSERACT_PATH = "/app/vendor/tesseract-ocr/bin/tesseract"
 
-# Set TESSDATA_PREFIX environment variable (ensures trained data is found)
-if "TESSDATA_PREFIX" not in os.environ:
-    os.environ["TESSDATA_PREFIX"] = "/app/.apt/usr/share/tesseract-ocr/5/tessdata"
+if os.path.exists(TESSERACT_PATH):
+    pytesseract.pytesseract.tesseract_cmd = TESSERACT_PATH
+    os.environ["PATH"] += os.pathsep + os.path.dirname(TESSERACT_PATH)
+else:
+    print("Tesseract binary not found!")
+
+# Set TESSDATA_PREFIX if needed (adjust path based on your findings)
+os.environ["TESSDATA_PREFIX"] = "/app/vendor/tesseract-ocr/share/tessdata"
 
 
 app = Flask(__name__)
