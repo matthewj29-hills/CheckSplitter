@@ -16,14 +16,14 @@ import pytesseract
 import os
 import pytesseract
 
-# Set the correct path for the newly installed Tesseract binary
-TESSERACT_PATH = "/app/.apt/usr/bin/tesseract"  # New path from the buildpack
+# Update the Tesseract path based on the buildpack installation
+TESSERACT_PATH = "/app/vendor/tesseract-ocr/bin/tesseract"
 pytesseract.pytesseract.tesseract_cmd = TESSERACT_PATH
 
-# Set the TESSDATA_PREFIX to match the buildpack’s tessdata location
-os.environ["TESSDATA_PREFIX"] = "/app/.apt/usr/share/tesseract-ocr/4.00/tessdata"
+# Set the correct tessdata directory
+os.environ["TESSDATA_PREFIX"] = "/app/vendor/tesseract-ocr/share/tessdata"
 
-# Debugging: Print to confirm correct paths in logs
+# Debugging: Print to confirm correct paths
 print(f"Tesseract Path: {pytesseract.pytesseract.tesseract_cmd}")
 print(f"TESSDATA_PREFIX: {os.environ['TESSDATA_PREFIX']}")
 
