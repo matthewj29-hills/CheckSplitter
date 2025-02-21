@@ -13,16 +13,20 @@ import os
 import urllib.request
 import pytesseract
 
-# Set the path for Tesseract OCR (no need to download)
-TESSERACT_PATH = "/app/.apt/usr/bin/tesseract"
+# Detect Tesseract binary path dynamically
+TESSERACT_PATHS = [
+    "/app/.apt/usr/bin/tesseract",  # Heroku Tesseract buildpack
+    "/usr/bin/tesseract",  # Default system install (e.g., local or different environments)
+]
 
-# Set Tesseract OCR path for pytesseract
-pytesseract.pytesseract.tesseract_cmd = TESSERACT_PATH
+for path in TESSERACT_PATHS:
+    if os.path.exists(path):
+        pytesseract.pytesseract.tesseract_cmd = path
+        break
 
-
-# Set Tesseract OCR path for pytesseract
-
-
+# Set TESSDATA_PREFIX environment variable (ensures trained data is found)
+if "TESSDATA_PREFIX" not in os.environ:
+    os.environ["TESSDATA_PREFIX"] = "/app/.apt/usr/share/tesseract-ocr/5/tessdata"
 
 
 app = Flask(__name__)
