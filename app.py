@@ -16,17 +16,17 @@ import pytesseract
 import os
 import pytesseract
 
-# Correct Tesseract path for Heroku
+# Set the correct path for Tesseract binary
 TESSERACT_PATH = "/app/vendor/tesseract-ocr/bin/tesseract"
+pytesseract.pytesseract.tesseract_cmd = TESSERACT_PATH
 
-if os.path.exists(TESSERACT_PATH):
-    pytesseract.pytesseract.tesseract_cmd = TESSERACT_PATH
-    os.environ["PATH"] += os.pathsep + os.path.dirname(TESSERACT_PATH)
-else:
-    print("Tesseract binary not found!")
+# Set the TESSDATA_PREFIX to the correct location
+os.environ["TESSDATA_PREFIX"] = "/app/vendor/tesseract-ocr/share/tessdata"
 
-# Ensure Tesseract can find its trained data
-os.environ["TESSDATA_PREFIX"] = "/app/.apt/usr/share/tesseract-ocr/4.00/tessdata"
+# Debugging: Print to confirm correct paths
+print(f"Tesseract Path: {pytesseract.pytesseract.tesseract_cmd}")
+print(f"TESSDATA_PREFIX: {os.environ['TESSDATA_PREFIX']}")
+
 
 app = Flask(__name__)
 app.secret_key = "your_secret_key"
