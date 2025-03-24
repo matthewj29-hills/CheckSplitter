@@ -3,7 +3,7 @@
 Check Splitter is a web application built to help users effortlessly split a restaurant bill based on the items they ordered. The app uses OCR (Optical Character Recognition) technology to scan and extract details from an image of a restaurant check, and then it calculates the split between different users. This project utilizes pytesseract for OCR image processing, and it is hosted on Heroku.
 
 ## **Project Status**
-This project is functional.
+This project is functional, but this is the first version. I have updated this application and it is published under Check-Splitter Enhanced, check it out!
 
 ## **Project Screen Shots**
 
